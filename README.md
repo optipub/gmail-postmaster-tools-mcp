@@ -119,6 +119,25 @@ are needed. Tokens are stored only on your machine at
 (list/get domains). Override with the `GPT_SCOPE` env var if you want to narrow
 it (e.g. traffic-only, dropping `list_domains`/`get_domain`).
 
+### Token lifetime (important)
+
+Google **revokes refresh tokens after 7 days** for OAuth apps whose publishing
+status is **Testing** — the mode the setup steps above use to skip verification.
+In practice that means you'll re-run `gpt_authenticate` about once a week. The
+server handles this gracefully: when the refresh fails, tool calls tell you to
+re-authenticate.
+
+To stop the weekly re-auth, set your OAuth app's publishing status to **In
+production** (Google Auth Platform → Audience → Publish app). Notes for the
+`postmaster` (sensitive) scopes:
+
+- **Production, unverified** — refresh tokens no longer expire at 7 days. You'll
+  still click through the "Google hasn't verified this app" screen, and the app
+  is capped at 100 users until verified. For your own single-user use, this is
+  the simple fix.
+- **Verified** — submit the app for Google's OAuth verification to remove the
+  warning and the user cap. Only worth it if you're distributing the app widely.
+
 ## Configuration (env overrides)
 
 | Variable | Purpose | Default |
