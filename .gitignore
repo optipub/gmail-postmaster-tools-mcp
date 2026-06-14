@@ -1,0 +1,17 @@
+# Build output
+*.mcpb
+
+# Tooling deps (no runtime deps required)
+node_modules/
+package-lock.json
+
+# Local token cache (never commit)
+.gmail-postmaster-mcp/
+tokens.json
+
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+*.log
+.idea/
+.vscode/

@@ -1,0 +1,21 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.optipub/gmail-postmaster-tools",
+  "title": "Gmail Postmaster Tools",
+  "description": "Gmail Postmaster Tools v2 — domains, traffic metrics, and compliance via your own Google OAuth.",
+  "version": "1.0.0",
+  "repository": {
+    "url": "https://github.com/optipub/gmail-postmaster-tools-mcp",
+    "source": "github"
+  },
+  "packages": [
+    {
+      "registryType": "mcpb",
+      "identifier": "https://github.com/optipub/gmail-postmaster-tools-mcp/releases/download/v1.0.0/gmail-postmaster-tools.mcpb",
+      "fileSha256": "set-by-ci-at-release-time",
+      "transport": {
+        "type": "stdio"
+      }
+    }
+  ]
+}

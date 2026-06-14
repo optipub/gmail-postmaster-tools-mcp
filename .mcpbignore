@@ -1,0 +1,11 @@
+# Files excluded from the packed .mcpb bundle (dev/CI only)
+.git/
+.github/
+.gitignore
+.mcpbignore
+CONTRIBUTING.md
+server.json
+node_modules/
+package-lock.json
+*.mcpb
+.DS_Store

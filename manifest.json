@@ -1,0 +1,57 @@
+{
+  "$schema": "https://raw.githubusercontent.com/anthropics/mcpb/main/schemas/mcpb-manifest-latest.schema.json",
+  "manifest_version": "0.3",
+  "name": "gmail-postmaster-tools",
+  "display_name": "Gmail Postmaster Tools",
+  "version": "1.0.0",
+  "description": "Query Gmail Postmaster Tools (v2 API) — domains, traffic metrics, and sender compliance — using your own Google OAuth client.",
+  "long_description": "Exposes the Gmail Postmaster Tools API v2 as MCP tools. This is a bring-your-own-credentials extension: you create a Google Cloud OAuth client of type \"Desktop app\", enable the Gmail Postmaster Tools API, and paste the Client ID and Client Secret into this extension's configuration. Sign-in uses an OAuth 2.0 authorization-code + PKCE flow over a 127.0.0.1 loopback redirect; tokens are cached locally and refreshed automatically. Then list your registered domains, read sender compliance verdicts (SPF/DKIM/DMARC, alignment, encryption, one-click unsubscribe, user-reported spam rate), and query traffic metrics (spam rate, auth success, TLS encryption, delivery errors, feedback loop) over any date range.",
+  "author": {
+    "name": "Kyle Renfrow",
+    "email": "kyle@optipub.com"
+  },
+  "license": "MIT",
+  "keywords": ["gmail", "postmaster", "google", "email", "deliverability", "reputation", "compliance", "spam-rate"],
+  "server": {
+    "type": "node",
+    "entry_point": "server/index.js",
+    "mcp_config": {
+      "command": "node",
+      "args": ["${__dirname}/server/index.js"],
+      "env": {
+        "GPT_CLIENT_ID": "${user_config.google_client_id}",
+        "GPT_CLIENT_SECRET": "${user_config.google_client_secret}"
+      }
+    }
+  },
+  "user_config": {
+    "google_client_id": {
+      "type": "string",
+      "title": "Google OAuth Client ID",
+      "description": "From a Google Cloud 'Desktop app' OAuth client (APIs & Services > Credentials). See the README for setup steps.",
+      "required": true
+    },
+    "google_client_secret": {
+      "type": "string",
+      "title": "Google OAuth Client Secret",
+      "description": "The client secret for the same Desktop app OAuth client. Stored locally; required by Google even for desktop apps.",
+      "required": true,
+      "sensitive": true
+    }
+  },
+  "tools": [
+    { "name": "gpt_authenticate", "description": "Sign in to Gmail Postmaster Tools via your Google OAuth client (opens the browser)." },
+    { "name": "gpt_auth_status", "description": "Show current sign-in status and token expiry." },
+    { "name": "gpt_sign_out", "description": "Delete the cached Google tokens (sign out)." },
+    { "name": "list_domains", "description": "List domains registered in your Postmaster Tools account." },
+    { "name": "get_domain", "description": "Get metadata for one registered domain." },
+    { "name": "get_compliance_status", "description": "Get sender compliance verdicts for a domain." },
+    { "name": "query_domain_stats", "description": "Query Gmail traffic metrics for a domain over a date range." }
+  ],
+  "compatibility": {
+    "platforms": ["darwin", "win32", "linux"],
+    "runtimes": {
+      "node": ">=18.0.0"
+    }
+  }
+}

@@ -1,0 +1,78 @@
+name: Build and Release MCPB
+
+# On a version tag (e.g. v1.0.0) this:
+#   1. builds the .mcpb bundle
+#   2. attaches it to a GitHub Release
+#   3. publishes the server to the MCP Registry (hash + metadata computed here,
+#      authenticated via GitHub OIDC — no secrets, no manual SHA needed)
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  id-token: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out
+        uses: actions/checkout@v5
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: "lts/*"
+
+      - name: Validate manifest
+        run: npx --yes @anthropic-ai/mcpb validate manifest.json
+
+      - name: Pack bundle
+        run: npx --yes @anthropic-ai/mcpb pack . gmail-postmaster-tools.mcpb
+
+      - name: Show bundle info
+        run: npx --yes @anthropic-ai/mcpb info gmail-postmaster-tools.mcpb
+
+      - name: Upload bundle as build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: gmail-postmaster-tools-mcpb
+          path: gmail-postmaster-tools.mcpb
+
+      - name: Attach bundle to release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: gmail-postmaster-tools.mcpb
+          generate_release_notes: true
+
+      # ---- Publish to the MCP Registry (tags only) ----
+
+      - name: Fill server.json (version, asset URL, SHA-256)
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          TAG="${GITHUB_REF#refs/tags/}"
+          VERSION="${TAG#v}"
+          URL="https://github.com/${GITHUB_REPOSITORY}/releases/download/${TAG}/gmail-postmaster-tools.mcpb"
+          SHA="$(sha256sum gmail-postmaster-tools.mcpb | awk '{print $1}')"
+          jq --arg v "$VERSION" --arg id "$URL" --arg sha "$SHA" \
+            '.version=$v | .packages[0].identifier=$id | .packages[0].fileSha256=$sha' \
+            server.json > server.tmp && mv server.tmp server.json
+          echo "Published metadata:"; cat server.json
+
+      - name: Install mcp-publisher
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          curl -L "https://github.com/modelcontextprotocol/registry/releases/latest/download/mcp-publisher_$(uname -s | tr '[:upper:]' '[:lower:]')_$(uname -m | sed 's/x86_64/amd64/;s/aarch64/arm64/').tar.gz" | tar xz mcp-publisher
+
+      - name: Authenticate to MCP Registry (GitHub OIDC)
+        if: startsWith(github.ref, 'refs/tags/')
+        run: ./mcp-publisher login github-oidc
+
+      - name: Publish to MCP Registry
+        if: startsWith(github.ref, 'refs/tags/')
+        run: ./mcp-publisher publish
