@@ -123,9 +123,17 @@ h1{font-size:20px;margin:0 0 12px;color:#1a73e8}p{font-size:14px;color:#333;line
 
 function openBrowser(url) {
   try {
-    if (process.platform === 'darwin') spawn('open', [url], { stdio: 'ignore', detached: true }).unref();
-    else if (process.platform === 'win32') spawn('cmd', ['/c', 'start', '', url], { stdio: 'ignore', detached: true }).unref();
-    else spawn('xdg-open', [url], { stdio: 'ignore', detached: true }).unref();
+    if (process.platform === 'darwin') {
+      spawn('open', [url], { stdio: 'ignore', detached: true }).unref();
+    } else if (process.platform === 'win32') {
+      // Avoid `cmd /c start` — it truncates URLs at `&`.
+      spawn('rundll32', ['url.dll,FileProtocolHandler', url], {
+        stdio: 'ignore',
+        detached: true,
+      }).unref();
+    } else {
+      spawn('xdg-open', [url], { stdio: 'ignore', detached: true }).unref();
+    }
   } catch (_) { /* URL is printed to stderr as a fallback */ }
 }
 

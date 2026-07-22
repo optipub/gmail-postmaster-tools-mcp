@@ -14,7 +14,7 @@ const auth = require('./auth');
 const gpt = require('./gpt');
 
 const SERVER_NAME = 'gmail-postmaster-tools';
-const SERVER_VERSION = '1.0.0';
+const SERVER_VERSION = '1.0.1';
 const PROTOCOL_VERSION = '2025-06-18';
 
 const TOOLS = [

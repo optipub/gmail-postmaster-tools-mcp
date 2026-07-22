@@ -3,7 +3,7 @@
   "manifest_version": "0.3",
   "name": "gmail-postmaster-tools",
   "display_name": "Gmail Postmaster Tools",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Query Gmail Postmaster Tools (v2 API) — domains, traffic metrics, and sender compliance — using your own Google OAuth client.",
   "long_description": "Exposes the Gmail Postmaster Tools API v2 as MCP tools. This is a bring-your-own-credentials extension: you create a Google Cloud OAuth client of type \"Desktop app\", enable the Gmail Postmaster Tools API, and paste the Client ID and Client Secret into this extension's configuration. Sign-in uses an OAuth 2.0 authorization-code + PKCE flow over a 127.0.0.1 loopback redirect; tokens are cached locally and refreshed automatically. Then list your registered domains, read sender compliance verdicts (SPF/DKIM/DMARC, alignment, encryption, one-click unsubscribe, user-reported spam rate), and query traffic metrics (spam rate, auth success, TLS encryption, delivery errors, feedback loop) over any date range.",
   "author": {
